@@ -1,0 +1,540 @@
+From 6096f420306e15f7be60ba512464811139f863e4 Mon Sep 17 00:00:00 2001
+From: Antony Riakiotakis <kalast@gmail.com>
+Date: Mon, 3 Dec 2012 03:00:38 +0200
+Subject: [PATCH] Changes for MinGW32 compilation
+
+---
+ src/CMakeLists.txt                   | 88 ++++++++++++++++++------------------
+ src/cmake/externalpackages.cmake     |  4 +-
+ src/include/fmath.h                  |  5 +-
+ src/include/thread.h                 |  1 +
+ src/libOpenImageIO/CMakeLists.txt    | 82 +++++++++++++++++----------------
+ src/libOpenImageIO/exif.cpp          |  1 +
+ src/libOpenImageIO/imagebufalgo.cpp  |  1 +
+ src/libOpenImageIO/imageinput.cpp    |  1 +
+ src/libtexture/imagecache.cpp        |  1 +
+ src/libtexture/texoptions.cpp        |  1 +
+ src/libtexture/texturesys.cpp        |  1 +
+ src/libutil/argparse.cpp             |  1 +
+ src/libutil/filesystem.cpp           |  8 ++--
+ src/libutil/plugin.cpp               |  2 +-
+ src/libutil/sysutil.cpp              |  2 +-
+ src/ptex.imageio/ptex/PtexCache.cpp  | 21 ++++++---
+ src/ptex.imageio/ptex/PtexPlatform.h |  7 +++
+ src/rla.imageio/rlaoutput.cpp        |  1 +
+ 18 files changed, 129 insertions(+), 99 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 86c0b76..20fbb61 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -241,14 +241,14 @@ include (CTest)
+ # Tell CMake to process the sub-directories
+ add_subdirectory (libOpenImageIO)
+ 
+-add_subdirectory (iconvert)
+-add_subdirectory (idiff)
+-add_subdirectory (igrep)
+-add_subdirectory (iinfo)
+-add_subdirectory (maketx)
+-add_subdirectory (oiiotool)
+-add_subdirectory (testtex)
+-add_subdirectory (iv)
++#add_subdirectory (iconvert)
++#add_subdirectory (idiff)
++#add_subdirectory (igrep)
++#add_subdirectory (iinfo)
++#add_subdirectory (maketx)
++#add_subdirectory (oiiotool)
++#add_subdirectory (testtex)
++#add_subdirectory (iv)
+ # Add IO plugin directories
+ if (NOT EMBEDPLUGINS)
+     add_subdirectory (bmp.imageio)
+@@ -311,52 +311,52 @@ if (DEFINED CMAKE_VERSION AND NOT CMAKE_VERSION VERSION_LESS 2.8)
+ endif()
+ 
+ # List all the individual testsuite tests here:
+-oiio_add_tests (ico gpsread misnamed-file nonwhole-tiles
+-                oiiotool oiiotool-composite oiiotool-fixnan 
+-                perchannel
+-                sgi rla psd dpx png
+-                texture-blurtube texture-fill texture-filtersize
+-                texture-gray texture-grid
+-                texture-missing texture-overscan
+-                texture-pointsample texture-width0blur texture-res
+-                texture-skinny texture-fat
+-               )
++#oiio_add_tests (ico gpsread misnamed-file nonwhole-tiles
++#                oiiotool oiiotool-composite oiiotool-fixnan 
++#                perchannel
++#                sgi rla psd dpx png
++#                texture-blurtube texture-fill texture-filtersize
++#                texture-gray texture-grid
++#                texture-missing texture-overscan
++#                texture-pointsample texture-width0blur texture-res
++#                texture-skinny texture-fat
++#               )
+ 
+ 
+ # List testsuites which need special external reference images from the web
+ # here:
+-oiio_add_tests (bmp
+-    IMAGEDIR bmpsuite
+-    URL http://entropymine.com/jason/bmpsuite/bmpsuite.zip)
++#oiio_add_tests (bmp
++#    IMAGEDIR bmpsuite
++#    URL http://entropymine.com/jason/bmpsuite/bmpsuite.zip)
+ 
+-oiio_add_tests (tiff-suite tiff-depths
+-    IMAGEDIR libtiffpic
+-    URL http://www.remotesensing.org/libtiff/images.html)
++#oiio_add_tests (tiff-suite tiff-depths
++#    IMAGEDIR libtiffpic
++#    URL http://www.remotesensing.org/libtiff/images.html)
+ 
+-oiio_add_tests (openexr-suite openexr-multires openexr-chroma openexr-v2
+-    IMAGEDIR openexr-images
+-    URL http://www.openexr.com/downloads.html)
++#oiio_add_tests (openexr-suite openexr-multires openexr-chroma openexr-v2
++#    IMAGEDIR openexr-images
++#    URL http://www.openexr.com/downloads.html)
+ 
+-oiio_add_tests (jpeg2000
+-    FOUNDVAR OPENJPEG_FOUND
+-    IMAGEDIR j2kp4files_v1_5
+-    URL http://www.itu.int/net/ITU-T/sigdb/speimage/ImageForm-s.aspx?val=10100803)
++#oiio_add_tests (jpeg2000
++#    FOUNDVAR OPENJPEG_FOUND
++#    IMAGEDIR j2kp4files_v1_5
++#    URL http://www.itu.int/net/ITU-T/sigdb/speimage/ImageForm-s.aspx?val=10100803)
+ 
+-oiio_add_tests (targa-tgautils
+-    IMAGEDIR TGAUTILS
+-    URL http://tgautils.inequation.org/)
++#oiio_add_tests (targa-tgautils
++#    IMAGEDIR TGAUTILS
++#    URL http://tgautils.inequation.org/)
+ 
+-oiio_add_tests (fits
+-    IMAGEDIR fits-images
+-    URL http://www.cv.nrao.edu/fits/data/tests/)
++#oiio_add_tests (fits
++#    IMAGEDIR fits-images
++#    URL http://www.cv.nrao.edu/fits/data/tests/)
+ 
+-oiio_add_tests (webp
+-    FOUNDVAR WEBP_FOUND
+-    IMAGEDIR webp-images
+-    URL http://code.google.com/speed/webp/gallery.html)
++#oiio_add_tests (webp
++#    FOUNDVAR WEBP_FOUND
++#    IMAGEDIR webp-images
++#    URL http://code.google.com/speed/webp/gallery.html)
+ 
+-oiio_add_tests (texture-field3d
+-    FOUNDVAR FIELD3D_FOUND)
++#oiio_add_tests (texture-field3d
++#    FOUNDVAR FIELD3D_FOUND)
+ 
+ 
+ #########################################################################
+@@ -390,7 +390,7 @@ if (WIN32)
+     set(CPACK_PACKAGE_EXECUTABLES "iv" "iv - Image Viewer")
+ #    set(CPACK_CREATE_DESCTOP_LINKS "iv" "iv - Image Viewer")
+     set(CPACK_NSIS_MODIFY_PATH ON)
+-    add_dll_files ()
++#    add_dll_files ()
+     include (InstallRequiredSystemLibraries)
+ endif ()
+ set (CPACK_SOURCE_PACKAGE_FILE_NAME OpenImageIO-${OIIO_VERSION_MAJOR}.${OIIO_VERSION_MINOR}.${OIIO_VERSION_PATCH}-source)
+diff --git a/src/cmake/externalpackages.cmake b/src/cmake/externalpackages.cmake
+index 1a08381..02bfb83 100644
+--- a/src/cmake/externalpackages.cmake
++++ b/src/cmake/externalpackages.cmake
+@@ -91,7 +91,7 @@ endmacro ()
+ 
+ message (STATUS "BOOST_ROOT ${BOOST_ROOT}")
+ 
+-set (Boost_ADDITIONAL_VERSIONS "1.49" "1.48" "1.47" "1.46" "1.45" "1.44" 
++set (Boost_ADDITIONAL_VERSIONS "1.51" "1.50" "1.49" "1.48" "1.47" "1.46" "1.45" "1.44" 
+                                "1.43" "1.43.0" "1.42" "1.42.0" 
+                                "1.41" "1.41.0" "1.40" "1.40.0")
+ if (LINKSTATIC)
+@@ -149,6 +149,8 @@ else ()
+     endif ()
+ endif ()
+ 
++add_definitions("-DBOOST_ALL_NO_LIB -DBOOST_THREAD_USE_LIB")
++
+ if (VERBOSE)
+     message (STATUS "Boost found ${Boost_FOUND} ")
+     message (STATUS "Boost version      ${Boost_VERSION}")
+diff --git a/src/include/fmath.h b/src/include/fmath.h
+index 45067f9..ad00bb1 100644
+--- a/src/include/fmath.h
++++ b/src/include/fmath.h
+@@ -46,6 +46,7 @@
+ #include <limits>
+ #include <typeinfo>
+ #include <algorithm>
++#include <float.h>
+ 
+ #if defined(_MSC_VER) && _MSC_VER < 1600
+    typedef __int8  int8_t;
+@@ -838,7 +839,7 @@ inline float degrees (float rad) { return rad * (float)(180.0 / M_PI); }
+ 
+ 
+ 
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__GNUC__)
+ // Windows doesn't define these functions from math.h
+ #define hypotf _hypotf
+ #define copysign(x,y) _copysign(x,y)
+@@ -963,7 +964,7 @@ truncf(float val)
+ 
+ 
+ // Some systems have isnan, isinf and isfinite in the std namespace.
+-#ifndef WIN32
++#ifdef __GNUC__
+  using std::isnan;
+  using std::isinf;
+  using std::isfinite;
+diff --git a/src/include/thread.h b/src/include/thread.h
+index 5682f9b..a956816 100644
+--- a/src/include/thread.h
++++ b/src/include/thread.h
+@@ -98,6 +98,7 @@
+ #endif
+ 
+ #if defined(__GNUC__) && (defined(_GLIBCXX_ATOMIC_BUILTINS) || (__GNUC__ * 100 + __GNUC_MINOR__ >= 401))
++#include <sched.h>
+ #if !defined(__FreeBSD__) || defined(__x86_64__)
+ #define USE_GCC_ATOMICS
+ #endif
+diff --git a/src/libOpenImageIO/CMakeLists.txt b/src/libOpenImageIO/CMakeLists.txt
+index bd5dbe3..9c4c297 100644
+--- a/src/libOpenImageIO/CMakeLists.txt
++++ b/src/libOpenImageIO/CMakeLists.txt
+@@ -264,59 +264,61 @@ oiio_install_targets (OpenImageIO)
+ if (NOT LINKSTATIC)
+     add_definitions (-DBOOST_TEST_DYN_LINK)
+     add_definitions (-DPTEX_EXPORTS)
++else ()
++    add_definitions (-DPTEX_STATIC)
+ endif ()
+ 
+-add_executable (imagebuf_test imagebuf_test.cpp)
+-link_ilmbase (imagebuf_test)
+-target_link_libraries (imagebuf_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_imagebuf imagebuf_test)
++#add_executable (imagebuf_test imagebuf_test.cpp)
++#link_ilmbase (imagebuf_test)
++#target_link_libraries (imagebuf_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_imagebuf imagebuf_test)
+ 
+-add_executable (imagebufalgo_test imagebufalgo_test.cpp)
+-link_ilmbase (imagebufalgo_test)
+-target_link_libraries (imagebufalgo_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_imagebufalgo imagebufalgo_test)
++#add_executable (imagebufalgo_test imagebufalgo_test.cpp)
++#link_ilmbase (imagebufalgo_test)
++#target_link_libraries (imagebufalgo_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_imagebufalgo imagebufalgo_test)
+ 
+ 
+-add_executable (atomic_test atomic_test.cpp)
+-target_link_libraries (atomic_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_atomic atomic_test)
++#add_executable (atomic_test atomic_test.cpp)
++#target_link_libraries (atomic_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_atomic atomic_test)
+ 
+-add_executable (spinlock_test spinlock_test.cpp)
+-target_link_libraries (spinlock_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_spinlock spinlock_test)
++#add_executable (spinlock_test spinlock_test.cpp)
++#target_link_libraries (spinlock_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_spinlock spinlock_test)
+ 
+-add_executable (spin_rw_test spin_rw_test.cpp)
+-target_link_libraries (spin_rw_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_spin_rw spin_rw_test)
++#add_executable (spin_rw_test spin_rw_test.cpp)
++#target_link_libraries (spin_rw_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_spin_rw spin_rw_test)
+ 
+-add_executable (ustring_test ustring_test.cpp)
+-target_link_libraries (ustring_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_ustring ustring_test)
++#add_executable (ustring_test ustring_test.cpp)
++#target_link_libraries (ustring_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_ustring ustring_test)
+ 
+-add_executable (imagespec_test imagespec_test.cpp)
+-target_link_libraries (imagespec_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_imagespec imagespec_test)
++#add_executable (imagespec_test imagespec_test.cpp)
++#target_link_libraries (imagespec_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_imagespec imagespec_test)
+ 
+-add_executable (strutil_test strutil_test.cpp)
+-target_link_libraries (strutil_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_strutil strutil_test)
++#add_executable (strutil_test strutil_test.cpp)
++#target_link_libraries (strutil_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_strutil strutil_test)
+ 
+-add_executable (fmath_test fmath_test.cpp)
+-target_link_libraries (fmath_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_fmath fmath_test)
++#add_executable (fmath_test fmath_test.cpp)
++#target_link_libraries (fmath_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_fmath fmath_test)
+ 
+-add_executable (filesystem_test filesystem_test.cpp)
+-target_link_libraries (filesystem_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_filesystem filesystem_test)
++#add_executable (filesystem_test filesystem_test.cpp)
++#target_link_libraries (filesystem_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_filesystem filesystem_test)
+ 
+-add_executable (optparser_test optparser_test.cpp)
+-target_link_libraries (optparser_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_optparser optparser_test)
++#add_executable (optparser_test optparser_test.cpp)
++#target_link_libraries (optparser_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_optparser optparser_test)
+ 
+-add_executable (hash_test hash_test.cpp)
+-target_link_libraries (hash_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+-add_test (unit_hash hash_test)
++#add_executable (hash_test hash_test.cpp)
++#target_link_libraries (hash_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_test (unit_hash hash_test)
+ 
+-add_executable (imagespeed_test imagespeed_test.cpp)
+-target_link_libraries (imagespeed_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
++#add_executable (imagespeed_test imagespeed_test.cpp)
++#target_link_libraries (imagespeed_test OpenImageIO ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+ #add_test (unit_hash hash_test)
+diff --git a/src/libOpenImageIO/exif.cpp b/src/libOpenImageIO/exif.cpp
+index 73175ab..37c80b2 100644
+--- a/src/libOpenImageIO/exif.cpp
++++ b/src/libOpenImageIO/exif.cpp
+@@ -36,6 +36,7 @@
+ #include <map>
+ #include <set>
+ #include <algorithm>
++#include <malloc.h>
+ 
+ #include <boost/foreach.hpp>
+ 
+diff --git a/src/libOpenImageIO/imagebufalgo.cpp b/src/libOpenImageIO/imagebufalgo.cpp
+index bd4af14..49468f5 100644
+--- a/src/libOpenImageIO/imagebufalgo.cpp
++++ b/src/libOpenImageIO/imagebufalgo.cpp
+@@ -47,6 +47,7 @@
+ #include <iostream>
+ #include <limits>
+ #include <stdexcept>
++#include <malloc.h>
+ 
+ #include "imagebuf.h"
+ #include "imagebufalgo.h"
+diff --git a/src/libOpenImageIO/imageinput.cpp b/src/libOpenImageIO/imageinput.cpp
+index d7ea193..6d89a0c 100644
+--- a/src/libOpenImageIO/imageinput.cpp
++++ b/src/libOpenImageIO/imageinput.cpp
+@@ -32,6 +32,7 @@
+ #include <cstdlib>
+ #include <cmath>
+ #include <vector>
++#include <malloc.h>
+ 
+ #include "dassert.h"
+ #include "typedesc.h"
+diff --git a/src/libtexture/imagecache.cpp b/src/libtexture/imagecache.cpp
+index ce5ea47..4e58c78 100644
+--- a/src/libtexture/imagecache.cpp
++++ b/src/libtexture/imagecache.cpp
+@@ -32,6 +32,7 @@
+ #include <string>
+ #include <sstream>
+ #include <vector>
++#include <malloc.h>
+ #include <boost/foreach.hpp>
+ #include <boost/filesystem.hpp>
+ #include <boost/algorithm/string.hpp>
+diff --git a/src/libtexture/texoptions.cpp b/src/libtexture/texoptions.cpp
+index 9441864..a3f9655 100644
+--- a/src/libtexture/texoptions.cpp
++++ b/src/libtexture/texoptions.cpp
+@@ -29,6 +29,7 @@
+ */
+ 
+ #include <string>
++#include <malloc.h>
+ #include <boost/scoped_ptr.hpp>
+ #include <boost/tr1/memory.hpp>
+ using namespace std::tr1;
+diff --git a/src/libtexture/texturesys.cpp b/src/libtexture/texturesys.cpp
+index c5fdd90..1a59be9 100644
+--- a/src/libtexture/texturesys.cpp
++++ b/src/libtexture/texturesys.cpp
+@@ -30,6 +30,7 @@
+ 
+ 
+ #include <math.h>
++#include <malloc.h>
+ #include <string>
+ #include <sstream>
+ #include <list>
+diff --git a/src/libutil/argparse.cpp b/src/libutil/argparse.cpp
+index 96f3a6f..495df21 100644
+--- a/src/libutil/argparse.cpp
++++ b/src/libutil/argparse.cpp
+@@ -39,6 +39,7 @@
+ #include <iterator>
+ #include <string>
+ #include <sstream>
++#include <malloc.h>
+ 
+ #include "strutil.h"
+ #include "sysutil.h"
+diff --git a/src/libutil/filesystem.cpp b/src/libutil/filesystem.cpp
+index 9ff5a31..209413b 100644
+--- a/src/libutil/filesystem.cpp
++++ b/src/libutil/filesystem.cpp
+@@ -265,7 +265,7 @@ Filesystem::open (std::ifstream &stream,
+                   const std::string &path,
+                   std::ios_base::openmode mode)
+ {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__GNUC__)
+     // Windows std::ifstream accepts non-standard wchar_t* 
+     std::wstring wpath = Strutil::utf8_to_utf16(path);
+     stream.open (wpath.c_str(), mode);
+@@ -281,7 +281,7 @@ Filesystem::open (std::ofstream &stream,
+                   const std::string &path,
+                   std::ios_base::openmode mode)
+ {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__GNUC__)
+     // Windows std::ofstream accepts non-standard wchar_t*
+     std::wstring wpath = Strutil::utf8_to_utf16 (path);
+     stream.open (wpath.c_str(), mode);
+@@ -293,7 +293,7 @@ Filesystem::open (std::ofstream &stream,
+ std::time_t
+ Filesystem::last_write_time (const std::string& path)
+ {
+-#ifdef _WIN32
++#if defined(_WIN32)
+     std::wstring wpath = Strutil::utf8_to_utf16 (path);
+     return boost::filesystem::last_write_time (wpath);
+ #else
+@@ -306,7 +306,7 @@ Filesystem::last_write_time (const std::string& path)
+ void
+ Filesystem::last_write_time (const std::string& path, std::time_t time)
+ {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__GNUC__)
+     std::wstring wpath = Strutil::utf8_to_utf16 (path);
+     boost::filesystem::last_write_time (wpath, time);
+ #else
+diff --git a/src/libutil/plugin.cpp b/src/libutil/plugin.cpp
+index ba09e33..b33af63 100644
+--- a/src/libutil/plugin.cpp
++++ b/src/libutil/plugin.cpp
+@@ -93,7 +93,7 @@ dlclose (Handle plugin_handle)
+ void *
+ dlsym (Handle plugin_handle, const char *symbol_name)
+ {
+-    return GetProcAddress ((HMODULE)plugin_handle, symbol_name);
++    return (void *)GetProcAddress ((HMODULE)plugin_handle, symbol_name);
+ }
+ 
+ 
+diff --git a/src/libutil/sysutil.cpp b/src/libutil/sysutil.cpp
+index f229948..740bd53 100644
+--- a/src/libutil/sysutil.cpp
++++ b/src/libutil/sysutil.cpp
+@@ -137,7 +137,7 @@ Sysutil::get_local_time (const time_t *time, struct tm *converted_time)
+ #ifdef _MSC_VER
+     localtime_s (converted_time, time);
+ #else
+-    localtime_r (time, converted_time);
++    *converted_time = *localtime(time);
+ #endif
+ }
+ 
+diff --git a/src/ptex.imageio/ptex/PtexCache.cpp b/src/ptex.imageio/ptex/PtexCache.cpp
+index 7794a21..868853a 100644
+--- a/src/ptex.imageio/ptex/PtexCache.cpp
++++ b/src/ptex.imageio/ptex/PtexCache.cpp
+@@ -224,12 +224,21 @@ public:
+ 	// split into dirs
+ 	_searchdirs.clear();
+ 	char* buff = strdup(path);
+-	char* pos = 0;
+-	char* token = strtok_r(buff, ":", &pos);
+-	while (token) {
+-	    if (token[0]) _searchdirs.push_back(token);
+-	    token = strtok_r(0, ":", &pos);
+-	}
++	char* pos = buff;
++
++	do {
++		char *token = pos;
++		pos = strstr(pos, ":");
++
++		if (pos) {
++			pos[0] = '\0';
++			pos++;
++		}
++
++		if (token[0]) _searchdirs.push_back(token);
++
++	} while(pos);
++
+ 	free(buff);
+     }
+ 
+diff --git a/src/ptex.imageio/ptex/PtexPlatform.h b/src/ptex.imageio/ptex/PtexPlatform.h
+index f6cc65d..ca166bf 100644
+--- a/src/ptex.imageio/ptex/PtexPlatform.h
++++ b/src/ptex.imageio/ptex/PtexPlatform.h
+@@ -79,11 +79,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ 
+ // missing functions on Windows
+ #ifdef WINDOWS
++#if !defined(__GNUC__)
+ #define snprintf sprintf_s
+ #define strtok_r strtok_s
++#endif
+ typedef __int64 FilePos;
++#if !defined(__GNUC__)
+ #define fseeko _fseeki64
+ #define ftello _ftelli64
++#else
++#define fseeko fseek
++#define ftello ftell
++#endif
+ 
+ inline double log2(double x) {
+     return log(x) * 1.4426950408889634; 
+diff --git a/src/rla.imageio/rlaoutput.cpp b/src/rla.imageio/rlaoutput.cpp
+index 0a43678..be01773 100644
+--- a/src/rla.imageio/rlaoutput.cpp
++++ b/src/rla.imageio/rlaoutput.cpp
+@@ -32,6 +32,7 @@
+ #include <cstdlib>
+ #include <cmath>
+ #include <ctime>
++#include <malloc.h>
+ 
+ #include "dassert.h"
+ #include "typedesc.h"
+-- 
+1.7.11.msysgit.1
+

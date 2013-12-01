@@ -1,0 +1,45 @@
+From cae82255bcd923c832681f610217de63ff6b193e Mon Sep 17 00:00:00 2001
+From: Antony Riakiotakis <kalast@gmail.com>
+Date: Tue, 4 Dec 2012 16:58:24 +0200
+Subject: [PATCH] More MinGW fixes, redefinition fix (needed for strict
+ warning check on OSL) and SHA1 fix (thanks to Sergey
+ Sharybin!)
+
+---
+ src/include/osdep.h  | 2 ++
+ src/libutil/SHA1.cpp | 3 +--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/include/osdep.h b/src/include/osdep.h
+index 4b23313..48eacf0 100644
+--- a/src/include/osdep.h
++++ b/src/include/osdep.h
+@@ -33,7 +33,9 @@
+ #ifdef _WIN32
+ # define WIN32_LEAN_AND_MEAN
+ # define VC_EXTRALEAN
++# ifndef __MINGW32__
+ # define NOMINMAX
++# endif
+ # include <windows.h>
+ #endif
+ 
+diff --git a/src/libutil/SHA1.cpp b/src/libutil/SHA1.cpp
+index b9e6c8b..0d24788 100644
+--- a/src/libutil/SHA1.cpp
++++ b/src/libutil/SHA1.cpp
+@@ -7,10 +7,9 @@
+ */
+ 
+ // If compiling with MFC, you might want to add #include "StdAfx.h"
+-
++#include "SHA1.h"
+ #include "hash.h"
+ #include "dassert.h"
+-#include "SHA1.h"
+ 
+ #ifdef SHA1_UTILITY_FUNCTIONS
+ #define SHA1_MAX_FILE_BUFFER 8000
+-- 
+1.7.11.msysgit.1
+
