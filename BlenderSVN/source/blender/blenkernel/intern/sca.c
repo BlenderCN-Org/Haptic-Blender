@@ -164,9 +164,6 @@ void init_sensor(bSensor *sens)
 	case SENS_OMNI:
 		sens->data= MEM_callocN(sizeof(bOmniSensor), "omnisens");
 		os= sens->data;
-		os->hatf = SENS_JOY_HAT_UP;
-		os->axis = 1;
-		os->hat = 1;
 		break;
 	default:
 		; /* this is very severe... I cannot make any memory for this        */

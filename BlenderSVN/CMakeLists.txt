@@ -227,6 +227,7 @@ endif()
 option(WITH_OPENCOLLADA		"Enable OpenCollada Support (http://www.opencollada.org)"	OFF)
 
 # Sound output
+option(WITH_H3D           "Enable H3D for haptic support" ON)
 option(WITH_SDL           "Enable SDL for sound and joystick support" ON)
 option(WITH_OPENAL        "Enable OpenAL Support (http://www.openal.org)" ON)
 option(WITH_JACK          "Enable Jack Support (http://www.jackaudio.org)" OFF)
@@ -627,6 +628,19 @@ if(UNIX AND NOT APPLE)
 		endif()
 	endif()
 
+	if(WITH_H3D)
+		find_package_wrapper(H3D)
+		mark_as_advanced(
+			H3DMAIN_LIBRARY
+			H3D_INCLUDE_DIR
+			H3D_LIBRARY
+			H3D_LIBRARY_TEMP
+		)
+		if(NOT H3D_FOUND)
+			set(WITH_H3D OFF)
+		endif()
+	endif()
+	
 	if(WITH_SDL)
 		find_package_wrapper(SDL)
 		mark_as_advanced(
@@ -1016,6 +1030,23 @@ elseif(WIN32)
 		set(SDL_LIBRARY SDL)
 		set(SDL_LIBPATH ${SDL}/lib)
 	endif()
+	
+	if(WITH_H3D)
+		set(H3D ${LIBDIR}/H3D)
+		set(H3D_INCLUDE_DIR ${H3D}/include)
+		set(H3D_INCLUDE_DIRS 
+			${H3D}/include/HAPI
+			${H3D}/include/HUTIL
+		)
+		set(H3D_LIBRARY H3D)
+		set(H3D_LIBPATH ${H3D}/lib32)
+		set(H3D_LIBRARIES
+			${H3D_LIBPATH}/Chai3DRenderer_vc9.lib
+			${H3D_LIBPATH}/H3DUtil_vc9.lib
+			${H3D_LIBPATH}/OpenHapticsRenderer_vc9.lib
+			${H3D_LIBPATH}/HAPI_vc9.lib
+		)
+	endif()
 
 	if(WITH_RAYOPTIMIZATION AND SUPPORT_SSE_BUILD)
 		add_definitions(-D__SSE__ -D__MMX__)
@@ -1170,6 +1201,25 @@ elseif(WIN32)
 			endif()
 		endif()
 
+		
+		
+		if(WITH_H3D)
+			set(H3D ${LIBDIR}/H3D)
+			set(H3D_INCLUDE_DIR ${H3D}/include)
+			set(H3D_INCLUDE_DIRS 
+				${H3D}/include/HAPI
+				${H3D}/include/HUTIL
+				)
+			set(H3D_LIBRARY H3D)
+			set(H3D_LIBPATH ${H3D}/lib32)
+			set(H3D_LIBRARIES
+				${H3D_LIBPATH}/Chai3DRenderer_vc9.lib
+				${H3D_LIBPATH}/H3DUtil_vc9.lib
+				${H3D_LIBPATH}/OpenHapticsRenderer_vc9.lib
+				${H3D_LIBPATH}/HAPI_vc9.lib
+				)
+		endif()
+		
 		if(WITH_IMAGE_OPENEXR)
 			set(OPENEXR ${LIBDIR}/openexr)
 			set(OPENEXR_INCLUDE_DIR ${OPENEXR}/include)
@@ -1656,6 +1706,13 @@ elseif(APPLE)
 		set(SDL_INCLUDE_DIR ${SDL}/include)
 		set(SDL_LIBRARY SDL)
 		set(SDL_LIBPATH ${SDL}/lib)
+	endif()
+	
+	if(WITH_H3D)
+		set(H3D ${LIBDIR}/H3D)
+		set(H3D_INCLUDE_DIR ${H3D}/include)
+		set(H3D_LIBRARY H3D)
+		set(H3D_LIBPATH ${H3D}/lib32)
 	endif()
 
 	set(PNG "${LIBDIR}/png")
@@ -2266,6 +2323,7 @@ if(FIRST_RUN)
 	info_cfg_text("Audio:")
 	info_cfg_option(WITH_OPENAL)
 	info_cfg_option(WITH_SDL)
+	info_cfg_option(WITH_H3D)
 	info_cfg_option(WITH_JACK)
 	info_cfg_option(WITH_JACK_DYNLOAD)
 	info_cfg_option(WITH_CODEC_AVI)

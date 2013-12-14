@@ -29,8 +29,8 @@
  *  \ingroup gamelogic
  */
 
-#ifndef __SCA_OmniMANAGER_H__
-#define __SCA_OmniMANAGER_H__
+#ifndef __SCA_OMNIMANAGER_H__
+#define __SCA_OMNIMANAGER_H__
 
 #include "SCA_EventManager.h"
 #include "Omni/SCA_Omni.h"
@@ -42,7 +42,7 @@ class SCA_OmniManager : public SCA_EventManager
 	/**
 	 * SDL Omni Class Instance
 	 */
-	SCA_Omni *m_Omni[JOYINDEX_MAX];
+	SCA_Omni *m_Omni[OMNIINDEX_MAX];
 public:
 	SCA_OmniManager(class SCA_LogicManager* logicmgr);
 	virtual ~SCA_OmniManager();

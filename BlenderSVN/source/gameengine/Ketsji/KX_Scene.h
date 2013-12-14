@@ -83,6 +83,7 @@ class RAS_IPolyMaterial;
 class RAS_IRasterizer;
 class RAS_IRenderTools;
 class SCA_JoystickManager;
+class SCA_OmniManager;
 class btCollisionShape;
 class KX_BlenderSceneConverter;
 struct KX_ClientObjectInfo;

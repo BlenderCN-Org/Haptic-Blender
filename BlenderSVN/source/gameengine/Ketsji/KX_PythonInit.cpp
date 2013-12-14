@@ -93,7 +93,7 @@ extern "C" {
 #include "SCA_RandomActuator.h"
 #include "SCA_KeyboardSensor.h" /* IsPrintable, ToCharacter */
 #include "SCA_JoystickManager.h" /* JOYINDEX_MAX */
-#include "SCA_OmniManager.h" /* JOYINDEX_MAX */
+#include "SCA_OmniManager.h" /* OMNIINDEX_MAX */
 #include "SCA_PythonJoystick.h"
 #include "SCA_PythonOmni.h"
 #include "SCA_PythonKeyboard.h"
@@ -157,7 +157,7 @@ static char gp_GamePythonPathOrig[FILE_MAX] = ""; // not super happy about this,
 static SCA_PythonKeyboard* gp_PythonKeyboard = NULL;
 static SCA_PythonMouse* gp_PythonMouse = NULL;
 static SCA_PythonJoystick* gp_PythonJoysticks[JOYINDEX_MAX] = {NULL};
-static SCA_PythonOmni* gp_PythonOmni[JOYINDEX_MAX] = {NULL};
+static SCA_PythonOmni* gp_PythonOmni[OMNIINDEX_MAX] = {NULL};
 #endif // WITH_PYTHON
 
 static KX_Scene*	gp_KetsjiScene = NULL;
@@ -1524,8 +1524,8 @@ PyObject *initGameLogic(KX_KetsjiEngine *engine, KX_Scene* scene) // quick hack 
 	}
 	PyDict_SetItemString(d, "joysticks", joylist);
 	
-	PyObject* omnilist = PyList_New(JOYINDEX_MAX);
-	for (int i=0; i<JOYINDEX_MAX; ++i) {
+	PyObject* omnilist = PyList_New(1);
+	for (int i=0; i<1; ++i) {
 		SCA_Omni* omni = SCA_Omni::GetInstance(i);
 		if (omni && omni->Connected()) {
 			gp_PythonOmni[i] = new SCA_PythonOmni(omni);
@@ -2071,7 +2071,7 @@ void exitGamePlayerPythonScripting()
 		}
 	}
 	
-	for (int i=0; i<JOYINDEX_MAX; ++i) {
+	for (int i=0; i<OMNIINDEX_MAX; ++i) {
 		if (gp_PythonOmni[i]) {
 			delete gp_PythonOmni[i];
 			gp_PythonOmni[i] = NULL;
@@ -2133,7 +2133,7 @@ void exitGamePythonScripting()
 		}
 	}
 
-	for (int i=0; i<JOYINDEX_MAX; ++i) {
+	for (int i=0; i<OMNIINDEX_MAX; ++i) {
 		if (gp_PythonOmni[i]) {
 			delete gp_PythonOmni[i];
 			gp_PythonOmni[i] = NULL;

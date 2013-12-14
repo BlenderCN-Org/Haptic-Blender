@@ -578,6 +578,7 @@ void BL_ConvertSensors(struct Object* blenderobject,
 				
 				bOmniSensor* bomni = (bOmniSensor*) sens->data;
 				
+
 				SCA_OmniManager *eventmgr 
 					= (SCA_OmniManager*) logicmgr->FindEventManager(SCA_EventManager::OMNI_EVENTMGR);
 				if (eventmgr) 
@@ -588,32 +589,28 @@ void BL_ConvertSensors(struct Object* blenderobject,
 					int hat		=0; 
 					int hatf	=0;
 					int prec	=0;
+
 					
 					switch (bomni->type) {
 					case SENS_JOY_AXIS:
-						axis	= bomni->axis;
-						axisf	= bomni->axisf;
-						prec	= bomni->precision;
 						omnitype  = SCA_OmniSensor::KX_OMNISENSORMODE_AXIS;
 						break;
 					case SENS_JOY_BUTTON:
-						button	= bomni->button;
+						// button	= bomni->button;
 						omnitype  = SCA_OmniSensor::KX_OMNISENSORMODE_BUTTON;
 						break;
 					case SENS_JOY_HAT:
-						hat		= bomni->hat;
-						hatf	= bomni->hatf;
 						omnitype  = SCA_OmniSensor::KX_OMNISENSORMODE_HAT;
 						break;
 					case SENS_JOY_AXIS_SINGLE:
-						axis	= bomni->axis_single;
-						prec	= bomni->precision;
+
 						omnitype  = SCA_OmniSensor::KX_OMNISENSORMODE_AXIS_SINGLE;
 						break;
 					default:
 						printf("Error: bad case statement\n");
 						break;
 					}
+					printf("Omni being made!");
 					gamesensor = new SCA_OmniSensor(
 						eventmgr,
 						gameobj,
@@ -623,11 +620,12 @@ void BL_ConvertSensors(struct Object* blenderobject,
 						prec,
 						button,
 						hat,hatf,
-						(bomni->flag & SENS_JOY_ANY_EVENT));
+						(bomni->flag & SENS_OMNI_ANY_EVENT));
+
 				} 
 				else
 				{
-					printf("Error there was a problem finding the event manager\n");
+					printf("Error there was a problem finding the OMNI EVENT manager\n");
 				}
 
 				break;

@@ -24,6 +24,7 @@
  *  \ingroup gamelogic
  */
 
+ 
 #ifndef __SCA_PYTHONOMNI_H__
 #define __SCA_PYTHONOMNI_H__
 
@@ -44,10 +45,7 @@ public:
 #ifdef WITH_PYTHON
 	virtual PyObject* py_repr(void);
 
-	static PyObject*	pyattr_get_num_x(void* self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_active_buttons(void* self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_hat_values(void* self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_axis_values(void* self_v, const KX_PYATTRIBUTE_DEF *attrdef);
+
 	static PyObject*	pyattr_get_name(void* self_v, const KX_PYATTRIBUTE_DEF *attrdef);
 #endif
 };

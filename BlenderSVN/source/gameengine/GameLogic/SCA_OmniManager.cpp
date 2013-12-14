@@ -42,7 +42,7 @@ SCA_OmniManager::SCA_OmniManager(class SCA_LogicManager* logicmgr)
 	: SCA_EventManager(logicmgr, OMNI_EVENTMGR)
 {
 	int i;
-	for (i=0; i<JOYINDEX_MAX; i++) {
+	for (i=0; i<1; i++) {//OMNIINDEX_MAX
 		m_Omni[i] = SCA_Omni::GetInstance( i );
 	}
 }
@@ -51,7 +51,7 @@ SCA_OmniManager::SCA_OmniManager(class SCA_LogicManager* logicmgr)
 SCA_OmniManager::~SCA_OmniManager()
 {
 	int i;
-	for (i=0; i<JOYINDEX_MAX; i++) {
+	for (i=0; i<1; i++) {
 		if (m_Omni[i])
 			m_Omni[i]->ReleaseInstance();
 	}
@@ -62,14 +62,13 @@ void SCA_OmniManager::NextFrame(double curtime,double deltatime)
 {
 	// We should always handle events in case we want to grab them with Python
 #ifdef WITH_SDL
-	SCA_Omni::HandleEvents(); /* Handle all SDL Omni events */
+	//SCA_Omni::HandleEvents(); /* Handle all Omni events */
 #endif
 
 	if (m_sensors.Empty()) {
 		return;
 	}
 	else {
-		;
 		SG_DList::iterator<SCA_OmniSensor> it(m_sensors);
 		for (it.begin();!it.end();++it)
 		{
@@ -88,5 +87,5 @@ SCA_Omni *SCA_OmniManager::GetOmniDevice( short int omniindex)
 	/*
 	 *Return the instance of SCA_Omni for use
 	 */
-	return m_Omni[omniindex];
+	return m_Omni[0];
 }

@@ -37,96 +37,51 @@
 #  include "SDL.h"
 #endif
 
-/**
- * Basic Omni class
- * I will make this class a singleton because there should be only one Omni
- * even if there are more than one scene using it and count how many scene are using it.
- * The underlying Omni should only be removed when the last scene is removed
- */
+#ifdef WITH_H3D
+#  include "HAPI/AnyHapticsDevice.h"
+#  include <HAPI/GodObjectRenderer.h>
+#endif
+
+using namespace HAPI;
 
 class SCA_Omni
 
 {
-	static SCA_Omni *m_instance[JOYINDEX_MAX];
-	static int m_joynum;
+	static SCA_Omni *m_instance[OMNIINDEX_MAX];
+	static int m_omninum;
 	static int m_refCount;
 
-	class PrivateData;
-#ifdef WITH_SDL
-	PrivateData		*m_private;
+	//class PrivateData;
+#ifdef WITH_H3D
+	AnyHapticsDevice	m_Omni;
+	//PrivateData		*m_private;
 #endif
 	int				m_omniindex;
 
-	/** 
-	 *support for JOYAXIS_MAX axes (in pairs)
-	 */
-	int m_axis_array[JOYAXIS_MAX];
 
-	/** 
-	 *support for JOYHAT_MAX hats (each is a direction)
-	 */
-	int m_hat_array[JOYHAT_MAX];
 	
 	/**
 	 * Precision or range of the axes
 	 */
 	int 			m_prec;
 
-	/**
-	 * max # of buttons avail
-	 */
-	
-	int 			m_axismax;
-	int 			m_buttonmax;
-	int 			m_hatmax;
+
 	
 	/** is the Omni initialized ?*/
 	bool			m_isinit;
 
-	
-	/** is triggered for each event type */
-	bool			m_istrig_axis;
-	bool			m_istrig_button;
-	bool			m_istrig_hat;
-
-#ifdef WITH_SDL
-	/**
-	 * event callbacks
-	 */
-	void OnAxisMotion(SDL_Event *sdl_event);
-	void OnHatMotion(SDL_Event *sdl_event);
-	void OnButtonUp(SDL_Event *sdl_event);
-	void OnButtonDown(SDL_Event *sdl_event);
-	void OnNothing(SDL_Event *sdl_event);
-#if 0 /* not used yet */
-	void OnBallMotion(SDL_Event *sdl_event) {}
-#endif
-		
-#endif /* WITH_SDL */
 	/**
 	 * Open the Omni
 	 */
 	bool CreateOmniDevice(void);
+	
 
 	/**
 	 * Close the Omni
 	 */
 	void DestroyOmniDevice(void);
 
-	/**
-	 * fills the axis member values
-	 */
-	void pFillButtons(void);
 
-	/**
-	 * returns m_axis_array
-	 */
-
-	int pAxisTest(int axisnum);
-	/**
-	 * returns m_axis_array
-	 */
-	int pGetAxis(int axisnum, int udlr);
 
 	SCA_Omni(short int index);
 
@@ -134,21 +89,13 @@ class SCA_Omni
 	
 public:
 
-	static SCA_Omni *GetInstance(short int joyindex);
+	static SCA_Omni *GetInstance(short int omniindex);
 	static void HandleEvents(void);
 	void ReleaseInstance();
+	void SetHapticObject(char * infile);
 	
 
-	/*
-	 */
-	bool aAxisPairIsPositive(int axis);
-	bool aAxisPairDirectionIsPositive(int axis, int dir); /* function assumes Omnis are in axis pairs */
-	bool aAxisIsPositive(int axis_single); /* check a single axis only */
 
-	bool aAnyButtonPressIsPositive(void);
-	bool aButtonPressIsPositive(int button);
-	bool aButtonReleaseIsPositive(int button);
-	bool aHatIsPositive(int hatnum, int dir);
 
 	/**
 	 * precision is default '3200' which is overridden by input
@@ -156,37 +103,14 @@ public:
 
 	void cSetPrecision(int val);
 
-	int GetAxisPosition(int index) {
-		return m_axis_array[index];
-	}
 
-	int GetHat(int index) {
-		return m_hat_array[index];
-	}
-
-	int GetThreshold(void) {
-		return m_prec;
-	}
-
-	bool IsTrigAxis(void) {
-		return m_istrig_axis;
-	}
 	
-	bool IsTrigButton(void) {
-		return m_istrig_button;
-	}
+		Vec3 getPosition(){//input some vector list
+			return m_Omni.getPosition();
+		}
+
 	
-	bool IsTrigHat(void) {
-		return m_istrig_hat;
-	}
 
-	/**
-	 * returns the # of...
-	 */
-
-	int GetNumberOfAxes(void);
-	int GetNumberOfButtons(void);
-	int GetNumberOfHats(void);
 	
 	/**
 	 * Test if the Omni is connected

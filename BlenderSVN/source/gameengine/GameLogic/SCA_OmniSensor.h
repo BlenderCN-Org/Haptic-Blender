@@ -117,7 +117,7 @@ public:
 	virtual bool IsPositiveTrigger();
 	virtual void Init();
 	
-	short int GetJoyIndex(void) {
+	short int GetOmniIndex(void) {
 		return m_omniindex;
 	}
 
@@ -128,38 +128,15 @@ public:
 	/* --------------------------------------------------------------------- */
 
 	/* Omni Index */
-	KX_PYMETHOD_DOC_NOARGS(SCA_OmniSensor,GetButtonActiveList)
-	KX_PYMETHOD_DOC_VARARGS(SCA_OmniSensor,GetButtonStatus)
 
-	static PyObject*	pyattr_get_axis_values(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_axis_single(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_hat_values(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_hat_single(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_num_axis(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_num_buttons(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
-	static PyObject*	pyattr_get_num_hats(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
+	KX_PYMETHOD_DOC_VARARGS(SCA_OmniSensor,SetHapticObject)
+
+
 	static PyObject*	pyattr_get_connected(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
+	static PyObject*	pyattr_get_position(void *self_v, const KX_PYATTRIBUTE_DEF *attrdef);
 	
 
-	/* attribute check */
-	static int CheckAxis(void *self, const PyAttributeDef*)
-	{
-		SCA_OmniSensor* sensor = reinterpret_cast<SCA_OmniSensor*>(self);
-		if (sensor->m_axis < 1)
-			sensor->m_axis = 1;
-		else if (sensor->m_axis > JOYAXIS_MAX)
-			sensor->m_axis = JOYAXIS_MAX;
-		return 0;
-	}
-	static int CheckHat(void *self, const PyAttributeDef*)
-	{
-		SCA_OmniSensor* sensor = reinterpret_cast<SCA_OmniSensor*>(self);
-		if (sensor->m_hat < 1)
-			sensor->m_hat = 1;
-		else if (sensor->m_hat > JOYHAT_MAX)
-			sensor->m_hat = JOYHAT_MAX;
-		return 0;
-	}
+
 	
 #endif  /* WITH_PYTHON */
 

@@ -137,7 +137,6 @@ set(SRC
 	Joystick/SCA_JoystickPrivate.h
 	Omni/SCA_Omni.h
 	Omni/SCA_OmniDefines.h
-	Omni/SCA_OmniPrivate.h
 )
 
 if(WITH_SDL)
@@ -150,6 +149,15 @@ if(WITH_SDL)
 	if(WITH_GHOST_SDL)
 		add_definitions(-DWITH_GHOST_SDL)
 	endif()
+endif()
+
+if(WITH_H3D)
+	list(APPEND INC_SYS
+		${H3D_INCLUDE_DIR}
+	)
+
+	add_definitions(-DWITH_H3D)
+
 endif()
 
 blender_add_lib(ge_logic "${SRC}" "${INC}" "${INC_SYS}")

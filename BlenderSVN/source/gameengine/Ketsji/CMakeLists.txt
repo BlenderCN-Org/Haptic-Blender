@@ -242,6 +242,14 @@ if(WITH_SDL)
 	add_definitions(-DWITH_SDL)
 endif()
 
+if(WITH_H3D)
+	list(APPEND INC_SYS
+		${H3D_INCLUDE_DIR}
+	)
+	add_definitions(-DWITH_H3D)
+
+endif()
+
 if(WITH_CODEC_FFMPEG)
 	add_definitions(-DWITH_FFMPEG)
 endif()

@@ -1110,43 +1110,44 @@ static void draw_sensor_joystick(uiLayout *layout, PointerRNA *ptr)
 
 static void draw_sensor_omni(uiLayout *layout, PointerRNA *ptr)
 {
-	uiLayout *col, *row;
+	int i =0;
+	// uiLayout *col, *row;
 
-	uiItemR(layout, ptr, "joystick_index", 0, NULL, ICON_NONE);
-	uiItemR(layout, ptr, "event_type", 0, NULL, ICON_NONE);
+	 uiItemR(layout, ptr, "omni_index", 0, NULL, ICON_NONE);
+	 // uiItemR(layout, ptr, "event_type", 0, NULL, ICON_NONE);
 
-	switch (RNA_enum_get(ptr, "event_type")) {
-		case SENS_JOY_BUTTON:
-			uiItemR(layout, ptr, "use_all_events", 0, NULL, ICON_NONE);
+	// switch (RNA_enum_get(ptr, "event_type")) {
+		// case SENS_JOY_BUTTON:
+			// uiItemR(layout, ptr, "use_all_events", 0, NULL, ICON_NONE);
 
-			col = uiLayoutColumn(layout, FALSE);
-			uiLayoutSetActive(col, RNA_boolean_get(ptr, "use_all_events") == FALSE);
-			uiItemR(col, ptr, "button_number", 0, NULL, ICON_NONE);
-			break;
-		case SENS_JOY_AXIS:
-			row = uiLayoutRow(layout, FALSE);
-			uiItemR(row, ptr, "axis_number", 0, NULL, ICON_NONE);
-			uiItemR(row, ptr, "axis_threshold", 0, NULL, ICON_NONE);
+			// col = uiLayoutColumn(layout, FALSE);
+			// uiLayoutSetActive(col, RNA_boolean_get(ptr, "use_all_events") == FALSE);
+			// uiItemR(col, ptr, "button_number", 0, NULL, ICON_NONE);
+			// break;
+		// case SENS_JOY_AXIS:
+			// row = uiLayoutRow(layout, FALSE);
+			// uiItemR(row, ptr, "axis_number", 0, NULL, ICON_NONE);
+			// uiItemR(row, ptr, "axis_threshold", 0, NULL, ICON_NONE);
 
-			uiItemR(layout, ptr, "use_all_events", 0, NULL, ICON_NONE);
-			col = uiLayoutColumn(layout, FALSE);
-			uiLayoutSetActive(col, RNA_boolean_get(ptr, "use_all_events") == FALSE);
-			uiItemR(col, ptr, "axis_direction", 0, NULL, ICON_NONE);
-			break;
-		case SENS_JOY_HAT:
-			uiItemR(layout, ptr, "hat_number", 0, NULL, ICON_NONE);
-			uiItemR(layout, ptr, "use_all_events", 0, NULL, ICON_NONE);
+			// uiItemR(layout, ptr, "use_all_events", 0, NULL, ICON_NONE);
+			// col = uiLayoutColumn(layout, FALSE);
+			// uiLayoutSetActive(col, RNA_boolean_get(ptr, "use_all_events") == FALSE);
+			// uiItemR(col, ptr, "axis_direction", 0, NULL, ICON_NONE);
+			// break;
+		// case SENS_JOY_HAT:
+			// uiItemR(layout, ptr, "hat_number", 0, NULL, ICON_NONE);
+			// uiItemR(layout, ptr, "use_all_events", 0, NULL, ICON_NONE);
 
-			col = uiLayoutColumn(layout, FALSE);
-			uiLayoutSetActive(col, RNA_boolean_get(ptr, "use_all_events") == FALSE);
-			uiItemR(col, ptr, "hat_direction", 0, NULL, ICON_NONE);
-			break;
-		case SENS_JOY_AXIS_SINGLE:
-			row = uiLayoutRow(layout, FALSE);
-			uiItemR(row, ptr, "single_axis_number", 0, NULL, ICON_NONE);
-			uiItemR(row, ptr, "axis_threshold", 0, NULL, ICON_NONE);
-			break;
-	}
+			// col = uiLayoutColumn(layout, FALSE);
+			// uiLayoutSetActive(col, RNA_boolean_get(ptr, "use_all_events") == FALSE);
+			// uiItemR(col, ptr, "hat_direction", 0, NULL, ICON_NONE);
+			// break;
+		// case SENS_JOY_AXIS_SINGLE:
+			// row = uiLayoutRow(layout, FALSE);
+			// uiItemR(row, ptr, "single_axis_number", 0, NULL, ICON_NONE);
+			// uiItemR(row, ptr, "axis_threshold", 0, NULL, ICON_NONE);
+			// break;
+	// }
 }
 
 static void draw_sensor_keyboard(uiLayout *layout, PointerRNA *ptr)

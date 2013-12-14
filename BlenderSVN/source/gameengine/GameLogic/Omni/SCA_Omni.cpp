@@ -33,127 +33,82 @@
 #  include <SDL.h>
 #endif
 
+#ifdef WITH_H3D
+#	include <HAPI/AnyHapticsDevice.h>
+#	include <HAPI/GodObjectRenderer.h>
+#	include <HAPI/FrictionSurface.h>
+#	include <HAPI/HapticTriangleTree.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
+#include <string>
+#include <cstring>
+
+
 
 #include "SCA_Omni.h"
-#include "SCA_OmniPrivate.h"
 
 #include "BLI_path_util.h"
 
+
+
 SCA_Omni::SCA_Omni(short int index)
 	:
-	m_omniindex(index),
+	m_omniindex(0),
 	m_prec(3200),
-	m_axismax(-1),
-	m_buttonmax(-1),
-	m_hatmax(-1),
-	m_isinit(0),
-	m_istrig_axis(0),
-	m_istrig_button(0),
-	m_istrig_hat(0)
-{
-	for (int i=0; i < JOYAXIS_MAX; i++)
-		m_axis_array[i] = 0;
-	
-	for (int i=0; i < JOYHAT_MAX; i++)
-		m_hat_array[i] = 0;
-	
-#ifdef WITH_SDL
-	m_private = new PrivateData();
+	m_isinit(0)
+	{
+#ifdef WITH_H3D
 #endif
 }
-
 
 SCA_Omni::~SCA_Omni()
 
 {
-#ifdef WITH_SDL
-	delete m_private;
+#ifdef WITH_H3D
+
 #endif
 }
-
-SCA_Omni *SCA_Omni::m_instance[JOYINDEX_MAX];
-int SCA_Omni::m_joynum = 0;
+SCA_Omni *SCA_Omni::m_instance[OMNIINDEX_MAX];
+int SCA_Omni::m_omninum = 0;
 int SCA_Omni::m_refCount = 0;
 
-SCA_Omni *SCA_Omni::GetInstance( short int joyindex )
+SCA_Omni *SCA_Omni::GetInstance( short int omniindex )
 {
-#ifndef WITH_SDL
-	return NULL;
-#else  /* WITH_SDL */
-	if (joyindex < 0 || joyindex >= JOYINDEX_MAX) {
-		Omni_ECHO("Error-invalid Omni index: " << joyindex);
+
+	if (omniindex < 0 || omniindex >= OMNIINDEX_MAX) {
+		Omni_ECHO("Error-invalid Omni index: " << omniindex);
 		return NULL;
 	}
 
-	if (m_refCount == 0) 
-	{
-		int i;
+	 if (m_refCount == 0) 
+	 {
+		 int i;
 
-		/* The video subsystem is required for Omni input to work. However,
-		 * when GHOST is running under SDL, video is initialized elsewhere. We
-		 * also need to set the videodriver to dummy, and do it here to avoid
-		 * interfering with addons that may use SDL too.
-		 *
-		 * We also init SDL once only. */
-#  ifdef WITH_GHOST_SDL
-		int success = (SDL_InitSubSystem(SDL_INIT_JOYSTICK) != -1 );
-#  else
-		/* set and restore environment variable */
-		char *videodriver = getenv("SDL_VIDEODRIVER");
-		BLI_setenv("SDL_VIDEODRIVER", "dummy");
 
-		int success = (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_VIDEO) != -1 );
-
-		BLI_setenv("SDL_VIDEODRIVER", videodriver);
-#  endif
-
-		if (!success) {
-			Omni_ECHO("Error-Initializing-SDL: " << SDL_GetError());
-			return NULL;
-		}
 		
-		m_joynum = SDL_NumJoysticks();
-		
-		for (i=0; i<JOYINDEX_MAX; i++) {
-			m_instance[i] = new SCA_Omni(i);
-			m_instance[i]->CreateOmniDevice();
+		for (i=0; i<1; i++) { //OMNIINDEX_MAX
+			 m_instance[i] = new SCA_Omni(i);
+			 m_instance[i]->CreateOmniDevice();
 		}
-		m_refCount = 1;
-	}
+		 m_refCount = 1;
+	 }
 	else
 	{
 		m_refCount++;
 	}
-	return m_instance[joyindex];
-#endif /* WITH_SDL */
+	return m_instance[0];
 }
 
 void SCA_Omni::ReleaseInstance()
 {
-	if (--m_refCount == 0)
-	{
-#ifdef WITH_SDL
-		int i;
-		for (i=0; i<JOYINDEX_MAX; i++) {
-			if (m_instance[i]) {
-				m_instance[i]->DestroyOmniDevice();
-				delete m_instance[i];
-			}
-			m_instance[i] = NULL;
-		}
 
-		/* The video subsystem is required for Omni input to work. However,
-		 * when GHOST is running under SDL, video is freed elsewhere.
-		 * Do this once only. */
-#  ifdef WITH_GHOST_SDL
-		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-#  else
-		SDL_QuitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_VIDEO);
-#  endif
-#endif /* WITH_SDL */
-	}
+	 m_Omni.disableDevice();
+	 m_Omni.releaseDevice();
+	 printf("Omni Released\n");
+	
 }
 
 void SCA_Omni::cSetPrecision(int val)
@@ -162,201 +117,130 @@ void SCA_Omni::cSetPrecision(int val)
 }
 
 
-bool SCA_Omni::aAxisPairIsPositive(int axis)
-{
-	return (pAxisTest(axis) > m_prec) ? true:false;
-}
 
-bool SCA_Omni::aAxisPairDirectionIsPositive(int axis, int dir)
+void SCA_Omni::SetHapticObject(char * infile)//input some vector list
 {
 
-	int res;
+	//if (infile.size() == strlen(infile.c_str()))
+	//	printf("Posisble problem?\n");
+	std::ifstream ifile(infile, ios::in);
+	//printf("File should be: %s\n",infile);
+	vector< HAPI::Collision::Triangle > triangles; 
+	int i =0;
+	Vec3 v0, v1, v2; 
+	string line;
 
-	if (dir==JOYAXIS_UP || dir==JOYAXIS_DOWN)
-		res = pGetAxis(axis, 1);
-	else /* JOYAXIS_LEFT || JOYAXIS_RIGHT */
-		res = pGetAxis(axis, 0);
+	if (!ifile) {
+	//  cerr << "Can't open input file " << infile.c_str() << endl;
+	}
+	if(ifile.is_open())
+	{
+		while (getline(ifile, line))
+			{
+				//printf("Should be in the file reading\n");
+				std::istringstream iss(line);
+
+				if (!(iss >> v0.x >> v0.z >> v0.y)) { break; } // error
+				v0.z=-v0.z;
+				printf("V1 %f %f %f\n",v0.x,v0.y,v0.z);
+
+				getline(ifile, line);
+				std::istringstream iss2(line);
+
+				if (!(iss2 >> v1.x >> v1.z >> v1.y)) { break; } // error
+				v1.z=-v1.z;
+				printf("V2 %f %f %f\n",v1.x,v1.y,v1.z);
+
+				getline(ifile, line);
+				std::istringstream iss3(line);
+
+				if (!(iss3 >> v2.x >> v2.z >> v2.y)) { break; } // error
+				v2.z=-v2.z;
+				printf("V3 %f %f %f\n",v2.x,v2.y,v2.z);
+
+				// process pair (a,b)
+			
+		   // get v0, v1 and v2 from your data structure
+		   // create HAPI triangle
+			   HAPI::Collision::Triangle t( v0, v1, v2);
+
+			   triangles.push_back( t );
+			   printf("Size of triangles %d\n",triangles.size());
+		   }
+	   ifile.close();
+	}
+	else
+	{
+		cout << infile << endl;
+		printf("Unable to open file\n");
+	}
+	//printf("Testing after file read %f %f %f\n",v0.x,v0.y,v0.z);
 	
-	if (dir==JOYAXIS_DOWN || dir==JOYAXIS_RIGHT)
-		return (res > m_prec) ? true : false;
-	else /* JOYAXIS_UP || JOYAXIS_LEFT */
-		return (res < -m_prec) ? true : false;
+
+	// Create the haptic shape to be rendered.
+	HAPI::Collision::AABBTree *the_tree = new HAPI::Collision::AABBTree( triangles );
+
+
+	HAPI::HAPISurfaceObject * my_surface = new HAPI::FrictionSurface();//new HAPI::FrictionSurface(2.0, 0, 0, 0, true, true);
+
+	HAPI::HapticTriangleTree *tree_shape;
+
+	// touch only outside (FRONT , also possible for inside (BACK) or both (will be something like BACK_AND_FRONT check the enum ;))
+	tree_shape = new HAPI::HapticTriangleTree( the_tree, my_surface, HAPI::Collision::FRONT );
+		
+	// Transfer shape to the haptics loop.
+	m_Omni.addShape( tree_shape );
+
+	m_Omni.transferObjects();
+	
+	printf("Added new mesh!\n");
 }
 
-bool SCA_Omni::aAxisIsPositive(int axis_single)
-{
-	return abs(m_axis_array[axis_single]) > m_prec ? true:false;
-}
-
-bool SCA_Omni::aAnyButtonPressIsPositive(void)
-{
-#ifdef WITH_SDL
-	/* this is needed for the "all events" option
-	 * so we know if there are no buttons pressed */
-	for (int i=0; i<m_buttonmax; i++)
-		if (SDL_JoystickGetButton(m_private->m_Omni, i))
-			return true;
-#endif
-	return false;
-}
-
-bool SCA_Omni::aButtonPressIsPositive(int button)
-{
-#ifndef WITH_SDL
-	return false;
-#else
-	bool result;
-	SDL_JoystickGetButton(m_private->m_Omni, button)? result = true:result = false;
-	return result;
-#endif
-}
-
-
-bool SCA_Omni::aButtonReleaseIsPositive(int button)
-{
-#ifndef WITH_SDL
-	return false;
-#else
-	bool result;
-	SDL_JoystickGetButton(m_private->m_Omni, button)? result = false : result = true;
-	return result;
-#endif
-}
-
-
-bool SCA_Omni::aHatIsPositive(int hatnum, int dir)
-{
-	return (GetHat(hatnum)==dir) ? true : false;
-}
-
-int SCA_Omni::GetNumberOfAxes()
-{
-	return m_axismax;
-}
-
-
-int SCA_Omni::GetNumberOfButtons()
-{
-	return m_buttonmax;
-}
-
-
-int SCA_Omni::GetNumberOfHats()
-{
-	return m_hatmax;
-}
-
+//INITIALIZE HAPTIC DEVICE HERE
+//bool 
 bool SCA_Omni::CreateOmniDevice(void)
 {
-#ifndef WITH_SDL
-	m_isinit = true;
-	m_axismax = m_buttonmax = m_hatmax = 0;
-	return false;
-#else /* WITH_SDL */
-	if (m_isinit == false) {
-		if (m_omniindex>=m_joynum) {
-			/* don't print a message, because this is done anyway */
-			//Omni_ECHO("Omni-Error: " << SDL_NumOmnis() << " avaiable Omni(s)");
-			
-			/* Need this so python args can return empty lists */
-			m_axismax = m_buttonmax = m_hatmax = 0;
-			return false;
+	
+
+		printf("Starting omni creationg\n");
+		m_Omni.setHapticsRenderer( new GodObjectRenderer() );
+		   if(m_Omni.initDevice() != HAPIHapticsDevice::SUCCESS ) {
+			 //cerr << m_private->m_Omni->getLastErrorMsg() << endl;
+			 m_isinit = false;
+			 printf("Device not found!\n");
+			 return false;
+		   }
+		   printf("Device should be created\n");
+	   m_isinit = true;
+		if(m_Omni.enableDevice() != HAPIHapticsDevice::SUCCESS){
+			printf("Device enabling failed!\n");
 		}
+		printf("Device is enabled (unless prev statment!\n");
+		return true;
 
-		m_private->m_Omni = SDL_JoystickOpen(m_omniindex);
-		SDL_JoystickEventState(SDL_ENABLE);
-		m_isinit = true;
-		
-		Omni_ECHO("Omni " << m_joyindex << " initialized");
-		
-		/* must run after being initialized */
-		m_axismax     = SDL_JoystickNumAxes(m_private->m_Omni);
-		m_buttonmax   = SDL_JoystickNumButtons(m_private->m_Omni);
-		m_hatmax      = SDL_JoystickNumHats(m_private->m_Omni);
-
-		if      (m_axismax > JOYAXIS_MAX) m_axismax = JOYAXIS_MAX;  /* very unlikely */
-		else if (m_axismax < 0)           m_axismax = 0;
-		
-		if      (m_hatmax > JOYHAT_MAX) m_hatmax = JOYHAT_MAX;  /* very unlikely */
-		else if (m_hatmax < 0)          m_hatmax = 0;
-		
-		if (m_buttonmax < 0) m_buttonmax = 0;
-		
-	}
-	return true;
-#endif /* WITH_SDL */
 }
 
 
 void SCA_Omni::DestroyOmniDevice(void)
 {
-#ifdef WITH_SDL
-	if (m_isinit) {
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-		if (SDL_JoystickGetAttached(m_private->m_Omni)) {
-#else
-		if (SDL_JoystickOpened(m_omniindex)) {
-#endif
-			Omni_ECHO("Closing-Omni " << m_joyindex);
-			SDL_JoystickClose(m_private->m_Omni);
-		}
-		m_isinit = false;
-	}
-#endif /* WITH_SDL */
+	 m_Omni.disableDevice();
+	 m_Omni.releaseDevice();
+	 printf("Omni destroyed\n");
 }
 
 int SCA_Omni::Connected(void)
 {
-#ifdef WITH_SDL
-	if (m_isinit
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-		&& SDL_JoystickGetAttached(m_private->m_Omni))
-#else
-	    && SDL_JoystickOpened(m_omniindex))
-#endif
-		return 1;
-#endif
+
+	if (m_isinit)// && m_private->m_Omni != NULL)
+		 return 1;
 	return 0;
 }
 
-int SCA_Omni::pGetAxis(int axisnum, int udlr)
-{
-#ifdef WITH_SDL
-	return m_axis_array[(axisnum*2)+udlr];
-#endif
-	return 0;
-}
 
-int SCA_Omni::pAxisTest(int axisnum)
-{
-#ifdef WITH_SDL
-	/* Use ints instead of shorts here to avoid problems when we get -32768.
-	 * When we take the negative of that later, we should get 32768, which is greater
-	 * than what a short can hold. In other words, abs(MIN_SHORT) > MAX_SHRT. */
-	int i1 = m_axis_array[(axisnum * 2)];
-	int i2 = m_axis_array[(axisnum * 2) + 1];
-	
-	/* long winded way to do:
-	 * return max_ff(absf(i1), absf(i2))
-	 * ...avoid abs from math.h */
-	if (i1 < 0) i1 = -i1;
-	if (i2 < 0) i2 = -i2;
-	if (i1 <i2) return i2;
-	else        return i1;
-#else /* WITH_SDL */
-	return 0;
-#endif /* WITH_SDL */
-}
 
 const char *SCA_Omni::GetName()
 {
-#ifdef WITH_SDL
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-	return SDL_JoystickName(m_private->m_Omni);
-#else
-	return SDL_JoystickName(m_omniindex);
-#endif
-#else /* WITH_SDL */
-	return "";
-#endif /* WITH_SDL */
+
+	return "This does nothing?";
+
 }

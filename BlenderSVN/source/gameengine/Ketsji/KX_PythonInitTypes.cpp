@@ -73,6 +73,7 @@
 #include "SCA_AlwaysSensor.h"
 #include "SCA_DelaySensor.h"
 #include "SCA_JoystickSensor.h"
+#include "SCA_OmniSensor.h"
 #include "SCA_KeyboardSensor.h"
 #include "SCA_MouseSensor.h"
 #include "SCA_NANDController.h"
@@ -82,6 +83,7 @@
 #include "SCA_XNORController.h"
 #include "SCA_XORController.h"
 #include "SCA_PythonJoystick.h"
+#include "SCA_PythonOmni.h"
 #include "SCA_PythonKeyboard.h"
 #include "SCA_PythonMouse.h"
 #include "KX_IpoActuator.h"
@@ -238,6 +240,7 @@ void initPyTypes(void)
 		PyType_Ready_Attr(dict, SCA_IObject, init_getset);
 		PyType_Ready_Attr(dict, SCA_ISensor, init_getset);
 		PyType_Ready_Attr(dict, SCA_JoystickSensor, init_getset);
+		PyType_Ready_Attr(dict, SCA_OmniSensor, init_getset);
 		PyType_Ready_Attr(dict, SCA_KeyboardSensor, init_getset);
 		PyType_Ready_Attr(dict, SCA_MouseSensor, init_getset);
 		PyType_Ready_Attr(dict, SCA_NANDController, init_getset);
@@ -252,6 +255,7 @@ void initPyTypes(void)
 		PyType_Ready_Attr(dict, SCA_XORController, init_getset);
 		PyType_Ready_Attr(dict, SCA_IController, init_getset);
 		PyType_Ready_Attr(dict, SCA_PythonJoystick, init_getset);
+		PyType_Ready_Attr(dict, SCA_PythonOmni, init_getset);
 		PyType_Ready_Attr(dict, SCA_PythonKeyboard, init_getset);
 		PyType_Ready_Attr(dict, SCA_PythonMouse, init_getset);
 	}

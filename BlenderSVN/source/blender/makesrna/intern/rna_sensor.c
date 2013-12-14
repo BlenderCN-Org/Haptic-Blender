@@ -917,6 +917,7 @@ static void rna_def_omni_sensor(BlenderRNA *brna)
 		{0, NULL, 0, NULL, NULL}
 	};
 
+	
 	srna = RNA_def_struct(brna, "OmniSensor", "Sensor");
 	RNA_def_struct_ui_text(srna, "Omni Sensor", "Sensor to detect haptic events");
 	RNA_def_struct_sdna_from(srna, "bOmniSensor", "data");
@@ -924,20 +925,19 @@ static void rna_def_omni_sensor(BlenderRNA *brna)
 	prop = RNA_def_property(srna, "omni_index", PROP_INT, PROP_NONE);
 	RNA_def_property_int_sdna(prop, NULL, "omniindex");
 	RNA_def_property_ui_text(prop, "Index", "Which omni to use");
-	RNA_def_property_range(prop, 0, SENS_JOY_MAXINDEX - 1);
+	RNA_def_property_range(prop, 0, SENS_OMNI_MAXINDEX - 1);
 	RNA_def_property_update(prop, NC_LOGIC, NULL);
 
-	prop = RNA_def_property(srna, "event_type", PROP_ENUM, PROP_NONE);
-	RNA_def_property_enum_sdna(prop, NULL, "type");
-	RNA_def_property_enum_items(prop, event_type_items);
-	RNA_def_property_ui_text(prop, "Event Type", "The type of event this joystick sensor is triggered on");
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	// prop = RNA_def_property(srna, "event_type", PROP_ENUM, PROP_NONE);
+	// RNA_def_property_enum_sdna(prop, NULL, "type");
+	// RNA_def_property_enum_items(prop, event_type_items);
+	// RNA_def_property_ui_text(prop, "Event Type", "The type of event this omni sensor is triggered on");
+	// RNA_def_property_update(prop, NC_LOGIC, NULL);
 
-	prop = RNA_def_property(srna, "use_all_events", PROP_BOOLEAN, PROP_NONE);
-	RNA_def_property_boolean_sdna(prop, NULL, "flag", SENS_JOY_ANY_EVENT);
-	RNA_def_property_ui_text(prop, "All Events",
-	                         "Triggered by all events on this joystick's current type (axis/button/hat)");
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	 prop = RNA_def_property(srna, "use_all_events", PROP_BOOLEAN, PROP_NONE);
+	 RNA_def_property_boolean_sdna(prop, NULL, "flag", SENS_OMNI_ANY_EVENT);
+	 RNA_def_property_ui_text(prop, "All Events", "Triggered by all events on this omni's current type (button/inkwell/movement)");
+	 RNA_def_property_update(prop, NC_LOGIC, NULL);
 
 	/* Button */
 	prop = RNA_def_property(srna, "button_number", PROP_INT, PROP_NONE);
@@ -946,44 +946,44 @@ static void rna_def_omni_sensor(BlenderRNA *brna)
 	RNA_def_property_range(prop, 0, 18);
 	RNA_def_property_update(prop, NC_LOGIC, NULL);
 
-	/* Axis */
-	prop = RNA_def_property(srna, "axis_number", PROP_INT, PROP_NONE);
-	RNA_def_property_int_sdna(prop, NULL, "axis");
-	RNA_def_property_ui_text(prop, "Axis Number", "Which axis pair to use, 1 is usually the main direction input");
-	RNA_def_property_range(prop, 1, 8);
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	// /* Axis */
+	// prop = RNA_def_property(srna, "axis_number", PROP_INT, PROP_NONE);
+	// RNA_def_property_int_sdna(prop, NULL, "axis");
+	// RNA_def_property_ui_text(prop, "Axis Number", "Which axis pair to use, 1 is usually the main direction input");
+	// RNA_def_property_range(prop, 1, 8);
+	// RNA_def_property_update(prop, NC_LOGIC, NULL);
 
-	prop = RNA_def_property(srna, "axis_threshold", PROP_INT, PROP_NONE);
-	RNA_def_property_int_sdna(prop, NULL, "precision");
-	RNA_def_property_ui_text(prop, "Axis Threshold", "Precision of the axis");
-	RNA_def_property_range(prop, 0, 32768);
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	// prop = RNA_def_property(srna, "axis_threshold", PROP_INT, PROP_NONE);
+	// RNA_def_property_int_sdna(prop, NULL, "precision");
+	// RNA_def_property_ui_text(prop, "Axis Threshold", "Precision of the axis");
+	// RNA_def_property_range(prop, 0, 32768);
+	// RNA_def_property_update(prop, NC_LOGIC, NULL);
 
-	prop = RNA_def_property(srna, "axis_direction", PROP_ENUM, PROP_NONE);
-	RNA_def_property_enum_sdna(prop, NULL, "axisf");
-	RNA_def_property_enum_items(prop, axis_direction_items);
-	RNA_def_property_ui_text(prop, "Axis Direction", "The direction of the axis");
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	// prop = RNA_def_property(srna, "axis_direction", PROP_ENUM, PROP_NONE);
+	// RNA_def_property_enum_sdna(prop, NULL, "axisf");
+	// RNA_def_property_enum_items(prop, axis_direction_items);
+	// RNA_def_property_ui_text(prop, "Axis Direction", "The direction of the axis");
+	// RNA_def_property_update(prop, NC_LOGIC, NULL);
 
 	/* Single Axis */
-	prop = RNA_def_property(srna, "single_axis_number", PROP_INT, PROP_NONE);
-	RNA_def_property_int_sdna(prop, NULL, "axis_single");
-	RNA_def_property_ui_text(prop, "Axis Number", "Single axis (vertical/horizontal/other) to detect");
-	RNA_def_property_range(prop, 1, 16);
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	// prop = RNA_def_property(srna, "single_axis_number", PROP_INT, PROP_NONE);
+	// RNA_def_property_int_sdna(prop, NULL, "axis_single");
+	// RNA_def_property_ui_text(prop, "Axis Number", "Single axis (vertical/horizontal/other) to detect");
+	// RNA_def_property_range(prop, 1, 16);
+	// RNA_def_property_update(prop, NC_LOGIC, NULL);
 
 	/* Hat */
-	prop = RNA_def_property(srna, "hat_number", PROP_INT, PROP_NONE);
-	RNA_def_property_int_sdna(prop, NULL, "hat");
-	RNA_def_property_ui_text(prop, "Hat Number", "Which hat to use");
-	RNA_def_property_range(prop, 1, 2);
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	// prop = RNA_def_property(srna, "hat_number", PROP_INT, PROP_NONE);
+	// RNA_def_property_int_sdna(prop, NULL, "hat");
+	// RNA_def_property_ui_text(prop, "Hat Number", "Which hat to use");
+	// RNA_def_property_range(prop, 1, 2);
+	// RNA_def_property_update(prop, NC_LOGIC, NULL);
 
-	prop = RNA_def_property(srna, "hat_direction", PROP_ENUM, PROP_NONE);
-	RNA_def_property_enum_sdna(prop, NULL, "hatf");
-	RNA_def_property_enum_items(prop, hat_direction_items);
-	RNA_def_property_ui_text(prop, "Hat Direction", "Hat direction");
-	RNA_def_property_update(prop, NC_LOGIC, NULL);
+	// prop = RNA_def_property(srna, "hat_direction", PROP_ENUM, PROP_NONE);
+	// RNA_def_property_enum_sdna(prop, NULL, "hatf");
+	// RNA_def_property_enum_items(prop, hat_direction_items);
+	// RNA_def_property_ui_text(prop, "Hat Direction", "Hat direction");
+	// RNA_def_property_update(prop, NC_LOGIC, NULL);
 }
 
 void RNA_def_sensor(BlenderRNA *brna)

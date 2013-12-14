@@ -196,13 +196,8 @@ typedef struct bOmniSensor {
 	char type;
 	char omniindex;
 	short flag;
-	short axis;
-	short axis_single;
-	int axisf;
 	int button;
-	int hat;
-	int hatf;
-	int precision;
+
 } bOmniSensor;
 
 /* bMouseSensor->type: uses blender event defines */
@@ -310,6 +305,8 @@ typedef struct bOmniSensor {
 #define BL_SENS_MOUSE_MOUSEOVER_ANY	 32
 
 /* Joystick sensor - sorted by axis types */
+#define SENS_OMNI_ANY_EVENT		1
+
 #define SENS_JOY_ANY_EVENT		1
 
 #define SENS_JOY_BUTTON		0			/* axis type */
@@ -342,5 +339,6 @@ typedef struct bOmniSensor {
 #define SENS_DELAY_REPEAT		1
 // should match JOYINDEX_MAX in SCA_JoystickDefines.h */
 #define SENS_JOY_MAXINDEX		8
+#define SENS_OMNI_MAXINDEX		8
 
 #endif  /* __DNA_SENSOR_TYPES_H__ */

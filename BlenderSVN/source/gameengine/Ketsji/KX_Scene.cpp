@@ -57,9 +57,14 @@
 #include "SCA_BasicEventManager.h"
 #include "KX_Camera.h"
 #include "SCA_JoystickManager.h"
+#include "SCA_OmniManager.h"
 #include "KX_PyMath.h"
 #include "RAS_MeshObject.h"
 #include "SCA_IScene.h"
+
+#ifdef DrawText
+#undef DrawText
+#endif
 
 #include "RAS_IRasterizer.h"
 #include "RAS_ICanvas.h"
@@ -208,6 +213,14 @@ KX_Scene::KX_Scene(class SCA_IInputDevice* keyboarddevice,
 	{
 		SCA_JoystickManager *joymgr	= new SCA_JoystickManager(m_logicmgr);
 		m_logicmgr->RegisterEventManager(joymgr);
+	}
+	
+	//hSystem = SYS_GetSystem();
+	bool noomni= SYS_GetCommandLineInt(hSystem,"noomni",0);
+	if (!noomni)
+	{
+		SCA_OmniManager *omnimgr	= new SCA_OmniManager(m_logicmgr);
+		m_logicmgr->RegisterEventManager(omnimgr);
 	}
 
 	MT_assert (m_networkDeviceInterface != NULL);
